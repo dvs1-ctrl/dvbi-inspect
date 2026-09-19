@@ -1,6 +1,6 @@
 // de Vine Building Inspections — Service Worker
 // Cache version — increment on every release to force cache refresh
-const CACHE_NAME = "inspectkit-de-vine-cache-v1";
+const CACHE_NAME = "inspectkit-de-vine-cache-v2";
 
 const CACHE_URLS = [
   "./inspectkit-capture-de-vine-standalone.html",
