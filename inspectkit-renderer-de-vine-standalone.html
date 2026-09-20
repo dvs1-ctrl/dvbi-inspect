@@ -521,8 +521,13 @@ body {
 
 /* Specialist-referrals advisory — renderer chrome only (hidden in print, see @media print) */
 #specialist-advisory-banner {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  z-index: 90;
   max-width: 210mm;
-  margin: 16px auto 0;
+  margin: 0 auto;
   padding: 12px 16px;
   display: flex;
   align-items: center;
@@ -1204,7 +1209,7 @@ body {
 @media print {
   #toolbar, #load-zone, #specialist-advisory-banner { display: none !important; }
   body { background: white; }
-  #report-wrapper { display: block !important; padding: 0; }
+  #report-wrapper { display: block !important; padding: 0 !important; }
 
   /* ─── Fix 1: Force colour preservation in PDF output ──────────────
      All background-colour and coloured text elements must use exact
@@ -1556,15 +1561,18 @@ function dismissSpecialistAdvisory() {
   specialistAdvisoryDismissed = true;
   const b = document.getElementById("specialist-advisory-banner");
   if (b) b.remove();
+  const w = document.getElementById("report-wrapper");
+  if (w) w.style.paddingTop = "";
 }
 function showSpecialistAdvisory(data) {
   const existing = document.getElementById("specialist-advisory-banner");
   if (existing) existing.remove();
+  const wrapper = document.getElementById("report-wrapper");
+  if (wrapper) wrapper.style.paddingTop = "";                    // clear stale offset
   if (specialistAdvisoryDismissed) return;
   data = data || {};
   if (!advHasRepairOrInvestigate(data.ratings)) return;
   if (advReferralsComplete(data.fields)) return;
-  const wrapper = document.getElementById("report-wrapper");
   if (!wrapper || !wrapper.parentNode) return;
   const banner = document.createElement("div");
   banner.id = "specialist-advisory-banner";
@@ -1574,6 +1582,7 @@ function showSpecialistAdvisory(data) {
     'section has been completed before delivering this report to your client.</div>' +
     '<button type="button" onclick="dismissSpecialistAdvisory()">Dismiss</button>';
   wrapper.parentNode.insertBefore(banner, wrapper);
+  wrapper.style.paddingTop = (banner.offsetHeight + 16) + "px";  // offset content below fixed banner
 }
 
 function renderReport(data) {
@@ -1865,11 +1874,10 @@ function renderCredentialsPage(data, pd, cfg, rn) {
       <div style="display:grid;grid-template-columns:240px 1fr;gap:30px;align-items:start;margin-top:4px">
         <div>
           ${photoBlock}
-          ${cfg.companyName ? `<div style="font:600 10px/1.4 var(--font-sans);letter-spacing:.1em;text-transform:uppercase;color:var(--brand-orange);margin-top:10px;text-align:center">${escHtml(cfg.companyName)}</div>` : ""}
         </div>
         <div>
           <div style="font:500 27px/1.1 var(--font-serif);color:var(--brand-navy)">${escHtml(cfg.inspectorName || "")}</div>
-          <div style="font:500 14px/1.4 var(--font-sans);color:#6b7480;margin-top:6px">${escHtml(cfg.inspectorCredentialRole || "Inspector")} · ${escHtml(cfg.inspectorCompany || cfg.companyName || "de Vine Building Inspections Ltd")}</div>
+          <div style="font:500 14px/1.4 var(--font-sans);color:#6b7480;margin-top:6px">${escHtml(cfg.inspectorCredentialRole || "Inspector")}<br>${escHtml(cfg.inspectorCompany || cfg.companyName || "de Vine Building Inspections Ltd")}</div>
           ${credsGrid}
         </div>
       </div>
